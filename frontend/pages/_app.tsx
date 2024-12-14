@@ -19,7 +19,7 @@ export default function App({ Component, pageProps }: AppProps) {
     <>
       <main className={roboto.className}>
         <div className="bg-base-100">
-          <div className="mx-auto max-w-screen-lg px-2">
+          <div className="mx-auto max-w-screen-xl px-2">
             <Component {...pageProps} />
           </div>
         </div>
