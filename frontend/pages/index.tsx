@@ -1,15 +1,40 @@
-import { useContext } from "react";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 import { filedataMock } from "@/mocks/filedataMock";
 import Header from "@/components/Header";
 
 export default function Home() {
   const mockData = filedataMock;
+  const { setTheme, theme } = useTheme();
+  const [isChecked, setIsChecked] = useState(false);
+
+  useEffect(() => {
+    // 現在のテーマに基づいてトグル状態を設定
+    setIsChecked(theme === "light");
+  }, [theme]);
+
+  const handleTheme = () => {
+    if (theme === "light") {
+      setTheme("dark");
+    } else if (theme === "dark") {
+      setTheme("light");
+    }
+  };
 
   return (
     <>
       <div>
         <Header />
-
+        <label className="flex cursor-pointer gap-2">
+          <span className="label-text">Current</span>
+          <input
+            type="checkbox"
+            onChange={handleTheme}
+            checked={isChecked}
+            className="theme-controller toggle"
+          />
+          <span className="label-text">Light</span>
+        </label>
         <div className="mt-5">
           <div className="mx-auto flex h-[700px] w-[1100px] flex-col items-center justify-center rounded-xl bg-base-300/50 p-5">
             <ul className="grid w-full grid-flow-col grid-cols-2 grid-rows-8 justify-items-center gap-3">
