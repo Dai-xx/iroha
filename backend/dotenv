@@ -1,0 +1,5 @@
+MONGO_URI = "mongodb+srv://taneyukihiro:taym37921103@cluster0.vxk9i.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+DB_NAME=mydatabase
+COLLECTION_NAME=uploads
+#database = client["<database name>"]
+#collection = database["<collection name>"]
