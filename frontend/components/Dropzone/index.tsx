@@ -1,14 +1,13 @@
-import { useCallback, useState } from "react";
+import { Dispatch, FC, SetStateAction, useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { FaFileArrowUp } from "react-icons/fa6";
 import useSWRMutation from "swr/mutation";
 
-const style = {
-  border: "3px dotted #888",
+type Prop = {
+  files: File[];
+  setFiles: Dispatch<SetStateAction<File[]>>;
 };
-const Dropzone = () => {
-  const [files, setFiles] = useState<File[]>([]);
-
+const Dropzone: FC<Prop> = ({ files, setFiles }) => {
   const onDrop = useCallback((acceptedFiles: any) => {
     // Do something with the files
     setFiles((prevFiles) => [...prevFiles, ...acceptedFiles]);
@@ -24,43 +23,11 @@ const Dropzone = () => {
     );
   };
 
-  const handleUpload = async (url: any) => {
-    if (files.length === 0) {
-      alert("ファイルを選択してください！");
-      return;
-    }
-
-    const formData = new FormData();
-    files.forEach((file, index) => {
-      formData.append(`file${index}`, file); // 各ファイルを追加
-    });
-
-    try {
-      const response = await fetch(url, {
-        method: "POST",
-        body: formData, // FormDataを送信
-      });
-
-      if (response.ok) {
-        alert("ファイルがアップロードされました！");
-      } else {
-        alert("アップロードに失敗しました。");
-      }
-    } catch (error) {
-      console.error("Error uploading files:", error);
-      alert("エラーが発生しました。");
-    }
-  };
-
-  const url = "http://127.0.0.1:5000/upload";
-  const { trigger, isMutating } = useSWRMutation(url, handleUpload);
-
   return (
     <>
       <div
         {...getRootProps()}
-        style={style}
-        className={`${isDragActive && "bg-white/20"} relative h-1/2 w-full rounded-[36px] p-7`}
+        className={`${isDragActive && "bg-white/20"} relative h-[200px] w-[420px] rounded-box border border-dashed border-primary p-7`}
       >
         <FaFileArrowUp
           size={40}
@@ -84,11 +51,6 @@ const Dropzone = () => {
             <input {...getInputProps()} />
           </div>
         )}
-      </div>
-      <div className="mt-5 flex justify-end">
-        <button onClick={() => trigger()} className="btn">
-          send
-        </button>
       </div>
     </>
   );

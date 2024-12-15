@@ -1,5 +1,6 @@
 import "@/styles/globals.css";
 import { Roboto } from "next/font/google";
+import { ThemeProvider } from "next-themes";
 import type { Metadata } from "next";
 import type { AppProps } from "next/app";
 
@@ -14,16 +15,20 @@ export const metadata: Metadata = {
   description: "",
 };
 
+const themeList: string[] = ["light", "dark"];
+
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
-      <main className={roboto.className}>
-        <div className="bg-base-100">
-          <div className="mx-auto max-w-screen-lg px-2">
-            <Component {...pageProps} />
+      <ThemeProvider themes={themeList}>
+        <main className={roboto.className}>
+          <div className="bg-base-100">
+            <div className="mx-auto max-w-screen-xl px-2">
+              <Component {...pageProps} />
+            </div>
           </div>
-        </div>
-      </main>
+        </main>
+      </ThemeProvider>
     </>
   );
 }
