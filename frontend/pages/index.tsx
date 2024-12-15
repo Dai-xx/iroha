@@ -2,8 +2,11 @@ import { useEffect, useState } from "react";
 import useSWR from "swr";
 import axios from "axios";
 import ReactPaginate from "react-paginate";
+import { FaRegSquarePlus } from "react-icons/fa6";
 import { filedataMock } from "@/mocks/filedataMock";
 import Header from "@/components/Header";
+import { PostModal } from "@/components/PostModal";
+import { useOpenModal } from "@/hooks";
 
 const fetcher = (url: any) => axios.get(url).then((res) => res.data);
 
@@ -30,15 +33,25 @@ export default function Home() {
   //   keepPreviousData: true,
   // });
 
+  const { isOpen, setIsOpen, openModal, closeModal } = useOpenModal();
+
   return (
     <>
       <div>
         <Header />
 
-        <div className="mt-5">
-          <div className="mx-auto flex h-[700px] w-[1100px] flex-col items-center justify-center rounded-xl bg-base-300/50 p-5">
-            <ul className="grid w-full grid-flow-col grid-cols-2 grid-rows-8 justify-items-center gap-3">
-              <div className="h-[70px] w-[440px] border-collapse rounded-lg border border-dashed border-primary"></div>
+        <button
+          onClick={openModal}
+          className="btn bg-accent text-accent-content"
+        >
+          <FaRegSquarePlus size={20} />
+          New
+        </button>
+        {isOpen && <PostModal isOpen={isOpen} closeModal={closeModal} />}
+
+        <div className="mt-2">
+          <div className="mx-auto flex h-[650px] w-full flex-col items-center justify-center rounded-xl bg-base-300/50 p-5">
+            <ul className="grid w-full grid-flow-col grid-cols-2 grid-rows-7 justify-items-center gap-3">
               {currentPosts.map((item, index) => {
                 return (
                   <li

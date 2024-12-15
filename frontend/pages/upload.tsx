@@ -5,7 +5,7 @@ export default function Upload() {
     <>
       <div className="flex items-center justify-center">
         <div className="h-[650px] w-[1000px] rounded-card bg-neutral p-7">
-          <Dropzone />
+          {/* <Dropzone /> */}
         </div>
       </div>
     </>
