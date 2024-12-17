@@ -6,34 +6,43 @@ import { FaRegSquarePlus } from "react-icons/fa6";
 import { filedataMock } from "@/mocks/filedataMock";
 import Header from "@/components/Header";
 import { PostModal } from "@/components/PostModal";
-import { useOpenModal } from "@/hooks";
+import { useOpenModal } from "@/hooks/useOpenModal";
+import CodeArea from "@/components/CodeArea";
+import { filecontentMock } from "@/mocks/filecontentMock";
+import usePagination from "@/hooks/usePagination";
 
 const fetcher = (url: any) => axios.get(url).then((res) => res.data);
 
 export default function Home() {
-  const mockData = filedataMock;
-  const [currentPage, setCurrentPage] = useState(1);
+  const mockmetaData = filedataMock;
+  const mockcontentData = filecontentMock;
   const pageSize = 14;
-  const totalPages = Math.ceil(mockData.length / pageSize);
-  const currentPosts = mockData.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize,
-  );
-
-  useEffect(() => {
-    console.log("currentPage", currentPage); // currentPageの変更を監視
-  }, [currentPage]); // currentPageが変わるたびに実行される
-
-  const handlePageClick = (event: any) => {
-    setCurrentPage(event.selected + 1);
-  };
+  const { currentPage, totalPages, currentPosts, handlePageClick } =
+    usePagination(mockmetaData, pageSize);
 
   // const { data, error } = useSWR(`/api/posts?page=${currentPage}`, fetcher, {
   //   revalidateOnFocus: false,
   //   keepPreviousData: true,
   // });
 
+  // const { data, error } = useSWR(`/api/posts?page=${project}`, fetcher, {
+  //   revalidateOnFocus: false,
+  //   keepPreviousData: true,
+  // });
+
+  // const code = data.data
+
   const { isOpen, setIsOpen, openModal, closeModal } = useOpenModal();
+
+  const [isOpenCode, setIsOpenCode] = useState(false);
+
+  const [project, setProject] = useState<string | null>(null);
+
+  const handleProject = (item: any) => {
+    setProject(item.projectId);
+    setIsOpenCode(true);
+  };
+  console.log("project", project);
 
   return (
     <>
@@ -50,20 +59,55 @@ export default function Home() {
         {isOpen && <PostModal isOpen={isOpen} closeModal={closeModal} />}
 
         <div className="mt-2">
-          <div className="mx-auto flex h-[650px] w-full flex-col items-center justify-center rounded-xl bg-base-300/50 p-5">
-            <ul className="grid w-full grid-flow-col grid-cols-2 grid-rows-7 justify-items-center gap-3">
-              {currentPosts.map((item, index) => {
-                return (
-                  <li
-                    key={index}
-                    className="btn no-animation h-[70px] w-[440px] bg-neutral text-neutral-content"
-                  >
-                    <p>{item.project}</p>
-                    <p>{item.createdAt}</p>
-                  </li>
-                );
-              })}
-            </ul>
+          <div
+            className={`mx-auto flex h-[650px] w-full justify-center rounded-xl bg-base-300/50 p-10`}
+          >
+            <div className={`${isOpenCode ? "w-1/2" : "w-full"}`}>
+              <ul className="grid grid-flow-col grid-cols-2 grid-rows-7 justify-items-center gap-3">
+                {currentPosts.map((item, index) => {
+                  return (
+                    <li
+                      key={index}
+                      onClick={handleProject}
+                      className={`${isOpenCode ? "max-w-[270px]" : "max-w-[440px]"} btn no-animation h-[70px] w-full bg-neutral text-neutral-content`}
+                    >
+                      <p>{item.project}</p>
+                      <p>{item.createdAt}</p>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+            {isOpenCode && (
+              <div className="w-1/2">
+                {isOpenCode && (
+                  <div role="tablist" className="tabs tabs-lifted">
+                    {mockcontentData.map((item, index) => {
+                      const isChecked = index === 0;
+                      return (
+                        <>
+                          <input
+                            key={index}
+                            type="radio"
+                            name="my_tabs"
+                            role="tab"
+                            className="tab"
+                            aria-label={item.filename}
+                            defaultChecked={isChecked}
+                          />
+                          <div
+                            role="tabpanel"
+                            className="tab-content rounded-box border-base-300 bg-base-100 p-6"
+                          >
+                            <CodeArea code={item.content} />
+                          </div>
+                        </>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
           <div className="mt-3">
             <nav className="flex justify-center">

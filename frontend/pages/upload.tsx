@@ -3,9 +3,48 @@ import Dropzone from "@/components/Dropzone";
 export default function Upload() {
   return (
     <>
-      <div className="flex items-center justify-center">
-        <div className="h-[650px] w-[1000px] rounded-card bg-neutral p-7">
-          {/* <Dropzone /> */}
+      <div role="tablist" className="tabs tabs-lifted relative w-1/2">
+        <input
+          type="radio"
+          name="my_tabs_2"
+          role="tab"
+          className="tab"
+          aria-label="Tab 1"
+        />
+        <div
+          role="tabpanel"
+          className="tab-content rounded-box border-base-300 bg-base-100 p-6"
+        >
+          Tab content 1
+        </div>
+
+        <input
+          type="radio"
+          name="my_tabs_2"
+          role="tab"
+          className="tab"
+          aria-label="Tab 2"
+          defaultChecked
+        />
+        <div
+          role="tabpanel"
+          className="tab-content rounded-box border-base-300 bg-base-100 p-6"
+        >
+          Tab content 2
+        </div>
+
+        <input
+          type="radio"
+          name="my_tabs_2"
+          role="tab"
+          className="tab"
+          aria-label="Tab 3"
+        />
+        <div
+          role="tabpanel"
+          className="tab-content rounded-box border-base-300 bg-base-100 p-6"
+        >
+          Tab content 3
         </div>
       </div>
     </>
