@@ -13,9 +13,9 @@ const style = {
 
 const CodeArea: FC<Prop> = ({ code }) => (
   <LiveProvider code={code}>
-    <LiveEditor style={style} />
+    <LiveEditor disabled style={style} />
     <LivePreview style={style} />
-    <LiveError style={style} />
+    {/* <LiveError style={style} /> */}
   </LiveProvider>
 );
 

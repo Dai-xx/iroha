@@ -44,7 +44,7 @@ export const PostModal: FC<Props> = ({ isOpen, closeModal }) => {
     }
   };
 
-  const url = "http://127.0.0.1:5000/upload";
+  const url = "http://127.0.0.1:5000/db/upload";
   const { trigger, isMutating } = useSWRMutation(url, handleUpload);
 
   return (
