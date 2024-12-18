@@ -13,6 +13,7 @@ import { filecontentMock } from "@/mocks/filecontentMock";
 import usePagination from "@/hooks/usePagination";
 import { validateName } from "@/utils/validateName";
 import Pagenaiton from "@/components/Pagenation";
+import { parseDate } from "@/utils/parseDate";
 
 interface Item {
   created_at: string;
@@ -94,33 +95,51 @@ export default function Home() {
               <ul className="grid w-full grid-flow-col grid-cols-2 grid-rows-7 justify-items-center gap-3">
                 {listData &&
                   listData.map((item: any, index: number) => {
+                    const dateObject = parseDate(item.created_at);
                     return (
                       <li
                         key={index}
                         onClick={() => handleProject(item)}
-                        className={`btn no-animation h-[70px] w-full min-w-[250px] overflow-hidden bg-neutral text-neutral-content`}
+                        className={`btn no-animation h-[70px] w-full min-w-[250px] overflow-hidden bg-neutral`}
                       >
-                        <h3 className="text-lg">{item.projectname}</h3>
-                        <p>{item.created_at}</p>
-                        {item &&
-                          item.metadata_list.map((file: any, index: number) => {
-                            const validatedFilename = validateName(
-                              file.filename,
-                              10,
-                            );
-                            return (
-                              <div
-                                key={index}
-                                className="flex flex-col items-center justify-center"
-                              >
-                                <div className="text-primary">
-                                  <FaRegFileCode size={30} />
+                        <div className="w-full">
+                          <div className="flex h-full gap-5 rounded-lg p-1 text-white">
+                            <div className="flex">
+                              <div>
+                                <div className="flex justify-between gap-2">
+                                  <p>{dateObject.month}月</p>
+                                  <p>{dateObject.dayOfWeek}</p>
                                 </div>
-
-                                <p className="text-xs">{validatedFilename}</p>
+                                <div className="text-4xl">
+                                  {dateObject.date}
+                                </div>
                               </div>
-                            );
-                          })}
+                              <div className="mx-2 rounded-full border-l-2 border-white/50"></div>
+                              <div className="w-[50px] text-left text-lg">
+                                <h3>{item.projectname}</h3>
+                              </div>
+                            </div>
+                            <div className="grid w-[200px] grid-cols-2 grid-rows-2 gap-1 font-normal">
+                              {item &&
+                                item.metadata_list.map(
+                                  (file: any, index: number) => {
+                                    const validatedFilename = validateName(
+                                      file.filename,
+                                      10,
+                                    );
+                                    return (
+                                      <div
+                                        key={index}
+                                        className="flex items-center rounded-[6px] bg-base-300/50 px-3 py-1"
+                                      >
+                                        <p>{validatedFilename}</p>
+                                      </div>
+                                    );
+                                  },
+                                )}
+                            </div>
+                          </div>
+                        </div>
                       </li>
                     );
                   })}
