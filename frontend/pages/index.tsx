@@ -1,7 +1,7 @@
 import { useState } from "react";
 import useSWR from "swr";
 import axios from "axios";
-import { FaRegFileCode, FaRegSquarePlus } from "react-icons/fa6";
+import { FaRegSquarePlus } from "react-icons/fa6";
 import { RxCross2 } from "react-icons/rx";
 import { useSpring, animated } from "@react-spring/web";
 import { filedataMock } from "@/mocks/filedataMock";
@@ -73,10 +73,6 @@ export default function Home() {
     opacity: isOpenCode ? 1 : 0,
   });
 
-  const fileblockStyle = useSpring({
-    flexGrow: isOpenCode ? 0.5 : 1, // アニメーション対象の flex-grow を指定
-  });
-
   return (
     <>
       <div>
@@ -102,7 +98,7 @@ export default function Home() {
                     const dateObject = parseDate(item.created_at);
                     const validatedProjectname = validateName(
                       item.projectname,
-                      5,
+                      7,
                     );
                     const validatedFiles =
                       isOpenCode && item.metadata_list.length > 1
@@ -127,12 +123,11 @@ export default function Home() {
                           {/* border */}
                           <div className="h-full rounded-full border-l-2 border-white/30"></div>
                           {/* projectname */}
-                          <div className="flex w-[60px] items-start text-left text-lg">
+                          <div className="w-[70px] text-left text-base">
                             <h3>{validatedProjectname}</h3>
                           </div>
 
                           {/* files */}
-                          {/* <animated.div style={fileblockStyle}> */}
                           <div className="grid-cols-auto-fill-[100px] grid flex-grow grid-rows-2 gap-1 font-normal">
                             {item &&
                               validatedFiles.map((file: any, index: number) => {
@@ -151,7 +146,6 @@ export default function Home() {
                                 );
                               })}
                           </div>
-                          {/* </animated.div> */}
                         </div>
                       </li>
                     );
@@ -191,7 +185,7 @@ export default function Home() {
                           role="tabpanel"
                           className="tab-content rounded-box border-base-300 bg-base-100"
                         >
-                          <div className="h-[530px] overflow-y-auto">
+                          <div className="h-[530px] w-[590px] overflow-y-auto">
                             <CodeArea code={decodedContent} />
                           </div>
                         </div>
