@@ -66,8 +66,8 @@ const Header: FC<Prop> = ({ setUserData }) => {
   return (
     <>
       <header className="h-24 py-5">
-        <div className="flex w-full justify-between">
-          <label className="flex cursor-pointer gap-2">
+        <div className="flex w-full justify-end">
+          {/* <label className="flex cursor-pointer gap-2">
             <span className="label-text">Current</span>
             <input
               type="checkbox"
@@ -76,7 +76,7 @@ const Header: FC<Prop> = ({ setUserData }) => {
               className="theme-controller toggle"
             />
             <span className="label-text">Light</span>
-          </label>
+          </label> */}
           {user ? (
             <div>
               <p></p>

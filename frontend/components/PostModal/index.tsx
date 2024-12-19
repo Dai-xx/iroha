@@ -7,7 +7,7 @@ import { userDataType } from "@/types/userDataType";
 type Props = {
   isOpen: boolean;
   closeModal: () => void;
-  userData: userDataType;
+  userData: any;
 };
 
 export const PostModal: FC<Props> = ({ isOpen, closeModal, userData }) => {
