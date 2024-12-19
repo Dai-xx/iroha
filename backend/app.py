@@ -1,3 +1,9 @@
+from flask import Flask
+from apps.auth import auth as auth_app
+from apps.db import db as db_app
+import os
+from flask_cors import CORS
+
 # from flask import Flask, request, jsonify, render_template, send_file, url_for
 # from flask_pymongo import PyMongo
 # from werkzeug.utils import secure_filename
@@ -458,20 +464,23 @@ def preview_file(project_id):
 
         # if not projectid_list:
         #     return jsonify({'error': 'File not found'}), 404
+        
 
-        files_binary = []
-        for file_data in projectid_list:
-            content_base64 = base64.b64encode(file_data['content']).decode('utf-8')
-            files_binary.append({
-                "filename": file_data.get('filename', 'unknown_file'),
-                "content": content_base64,
-                "file_type": file_data.get('file_type', 'application/octet-stream')
-            })
-        return jsonify({"project_id": project_id, "files": files_binary}), 200
+# appsディレクトリをPythonのモジュール検索パスに追加
 
-    except Exception as e:
-        return jsonify({'error': f"An error occurred: {str(e)}"}), 500
+def create_app():
+ 
+    app = Flask(__name__)
 
+    CORS(app)
 
-if __name__ == '__main__':
+    app.secret_key = os.urandom(24)
+    
+    # 各アプリを登録する
+    app.register_blueprint(auth_app.auth, url_prefix="/auth")
+    app.register_blueprint(db_app.db, url_prefix="/db")
+    return app
+
+if __name__ == "__main__":
+    app = create_app()
     app.run(debug=True)

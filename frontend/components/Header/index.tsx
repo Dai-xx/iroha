@@ -2,12 +2,30 @@ import Image from "next/image";
 import { BiLogIn } from "react-icons/bi";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import useSWR from "swr";
+import axios from "axios";
+
+type User = {
+  email: string;
+  name: string;
+  picture: string;
+  uid: string;
+};
+
+const fetcher = (url: string) =>
+  axios
+    .get(url, { withCredentials: true })
+    .then((res) => res.data)
+    .catch((err) => {
+      console.error("認証エラー", err);
+      return null; // エラー時にはnullを返す
+    });
 
 const Header = () => {
-  const [isLogin, setIsLogin] = useState(true);
-
   const { setTheme, theme } = useTheme();
   const [isChecked, setIsChecked] = useState(false);
+
   useEffect(() => {
     // 現在のテーマに基づいてトグル状態を設定
     setIsChecked(theme === "light");
@@ -20,6 +38,23 @@ const Header = () => {
       setTheme("light");
     }
   };
+
+  const router = useRouter();
+
+  const handleLogin = () => {
+    // Next.jsのAPI経由でFlaskのログインを開始
+    router.push("/api/login");
+  };
+
+  const { data: user, error } = useSWR<User>(
+    "http://localhost:5000/auth/user_info",
+    fetcher,
+  );
+
+  if (error) return <p>Error loading profile.</p>;
+  // if (!user) return <p>Loading...</p>;
+
+  console.log("user", user);
 
   return (
     <>
@@ -35,19 +70,20 @@ const Header = () => {
             />
             <span className="label-text">Light</span>
           </label>
-          {isLogin ? (
-            <div className="avatar">
-              <div className="mask mask-hexagon w-16">
-                <Image
-                  src="/sources/user_icon.png"
-                  alt="user icon"
-                  style={{ objectFit: "cover" }}
-                  fill
-                />
+          {user ? (
+            <div>
+              <p></p>
+              <div className="avatar">
+                <div className="mask mask-hexagon w-16">
+                  <Image src={user.picture} alt="user icon" fill />
+                </div>
               </div>
             </div>
           ) : (
-            <button className="btn bg-accent text-accent-content">
+            <button
+              onClick={handleLogin}
+              className="btn bg-accent text-accent-content"
+            >
               Login
               <BiLogIn size={20} />
             </button>
