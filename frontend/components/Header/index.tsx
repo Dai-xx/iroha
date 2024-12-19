@@ -70,7 +70,7 @@ const Header = () => {
             />
             <span className="label-text">Light</span>
           </label>
-          {user !== null ? (
+          {user ? (
             <div>
               <p></p>
               <div className="avatar">
