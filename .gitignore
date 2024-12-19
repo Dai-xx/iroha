@@ -1,0 +1,14 @@
+# .env ファイル
+.env
+frontend/.env
+backend/.env
+
+# node_modules フォルダ（フロントエンドとバックエンド）
+node_modules/
+frontend/node_modules/
+backend/node_modules/
+
+# その他の無視するファイル
+.DS_Store
+.idea/
+.vscode/
