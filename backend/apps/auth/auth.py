@@ -1,4 +1,4 @@
-from flask import Blueprint,Flask, redirect, url_for, session, request, render_template, jsonify
+from flask import Blueprint, redirect, url_for, session, request, render_template, jsonify
 from flask_cors import CORS
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
