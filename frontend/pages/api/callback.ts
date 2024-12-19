@@ -7,9 +7,11 @@ export default async function handler(
 ) {
   if (req.method === "GET") {
     try {
-      const { data } = await axios.get("http://localhost:5000/callback", {
+      const { data } = await axios.get("http://127.0.0.1:5000/auth/callback", {
         params: req.query, // Flaskのcallbackで必要なクエリパラメータを渡す
       });
+
+      console.log("req.query", req.query);
 
       // 認証成功したユーザー情報をフロントエンドに返す
       res.status(200).json(data);

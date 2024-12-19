@@ -1,4 +1,3 @@
-import axios from "axios";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
@@ -8,7 +7,7 @@ export default async function handler(
   if (req.method === "GET") {
     try {
       // Flaskのログインエンドポイントを呼び出す
-      const flaskLoginUrl = "http://localhost:5000/login"; // FlaskのログインURL
+      const flaskLoginUrl = "http://localhost:5000/auth/login"; // FlaskのログインURL
       res.redirect(flaskLoginUrl);
     } catch (error) {
       console.error("Error connecting to Flask:", error);

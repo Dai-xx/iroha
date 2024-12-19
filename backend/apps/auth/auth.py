@@ -1,4 +1,5 @@
-from flask import Blueprint,Flask, redirect, url_for, session, request, render_template
+from flask import Blueprint,Flask, redirect, url_for, session, request, render_template, jsonify
+from flask_cors import CORS
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
 from google.auth.transport import requests as google_requests
@@ -9,7 +10,7 @@ auth = Blueprint("auth", __name__, template_folder="templates", static_folder="s
 # .envファイルの読み込み
 #load_dotenv()
 
-
+CORS(auth, origins="http://localhost:3000", supports_credentials=True)
 
 # Google OAuth 2.0の設定
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
@@ -55,7 +56,14 @@ def callback():
     session['name'] = id_info.get("name")
     session['picture'] = id_info.get("picture")
 
-    return redirect(url_for('auth.profile'))
+    # return jsonify({
+    #         'google_id': session['google_id'],
+    #         'email': session['email'],
+    #         'name': session['name'],
+    #         'picture': session['picture'],
+    #     })
+
+    return redirect("http://localhost:3000")
 
 @auth.route('/profile')
 def profile():
@@ -70,6 +78,20 @@ def profile():
     }
 
     return render_template('profile.html', user=user_info)
+
+@auth.route('/user_info', methods=['GET'])
+def user_info():
+    # セッションにユーザー情報が保存されているか確認
+    if 'google_id' not in session:
+        return jsonify({'error': 'User not authenticated'}), 401
+
+    user_info = {
+        'google_id': session['google_id'],
+        'email': session['email'],
+        'name': session['name'],
+        'picture': session['picture']
+    }
+    return jsonify(user_info)
 
 @auth.route('/logout')
 def logout():

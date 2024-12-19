@@ -3,16 +3,26 @@ import { BiLogIn } from "react-icons/bi";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import useSWR from "swr";
+import axios from "axios";
 
 type User = {
-  name: string;
   email: string;
-  id: string;
+  name: string;
+  picture: string;
+  uid: string;
 };
 
-const Header = () => {
-  const [user, setUser] = useState<User | null>(null);
+const fetcher = (url: string) =>
+  axios
+    .get(url, { withCredentials: true })
+    .then((res) => res.data)
+    .catch((err) => {
+      console.error("認証エラー", err);
+      return null; // エラー時にはnullを返す
+    });
 
+const Header = () => {
   const { setTheme, theme } = useTheme();
   const [isChecked, setIsChecked] = useState(false);
 
@@ -29,22 +39,22 @@ const Header = () => {
     }
   };
 
-  useEffect(() => {
-    // サーバーサイドのAPI経由でユーザー情報を取得
-    fetch("/api/callback")
-      .then((res) => res.json())
-      .then((data) => setUser(data))
-      .catch((err) => console.error("Failed to fetch user:", err));
-  }, []);
-
-  console.log("user", user);
-
   const router = useRouter();
 
   const handleLogin = () => {
     // Next.jsのAPI経由でFlaskのログインを開始
     router.push("/api/login");
   };
+
+  const { data: user, error } = useSWR<User>(
+    "http://localhost:5000/auth/user_info",
+    fetcher,
+  );
+
+  if (error) return <p>Error loading profile.</p>;
+  if (!user) return <p>Loading...</p>;
+
+  console.log("user", user);
 
   return (
     <>
@@ -62,15 +72,10 @@ const Header = () => {
           </label>
           {user !== null ? (
             <div>
-              <p>{user.name}</p>
+              <p></p>
               <div className="avatar">
                 <div className="mask mask-hexagon w-16">
-                  <Image
-                    src="/sources/user_icon.png"
-                    alt="user icon"
-                    style={{ objectFit: "cover" }}
-                    fill
-                  />
+                  <Image src={user.picture} alt="user icon" fill />
                 </div>
               </div>
             </div>

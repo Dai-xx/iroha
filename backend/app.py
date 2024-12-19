@@ -2,12 +2,15 @@ from flask import Flask
 from apps.auth import auth as auth_app
 from apps.db import db as db_app
 import os
+from flask_cors import CORS
 
 # appsディレクトリをPythonのモジュール検索パスに追加
 
 def create_app():
  
     app = Flask(__name__)
+
+    CORS(app)
 
     app.secret_key = os.urandom(24)
     
