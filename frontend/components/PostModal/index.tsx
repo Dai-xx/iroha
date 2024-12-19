@@ -2,13 +2,15 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { Dispatch, FC, SetStateAction, useState } from "react";
 import useSWRMutation from "swr/mutation";
 import Dropzone from "@/components/Dropzone";
+import { userDataType } from "@/types/userDataType";
 
 type Props = {
   isOpen: boolean;
   closeModal: () => void;
+  userData: userDataType;
 };
 
-export const PostModal: FC<Props> = ({ isOpen, closeModal }) => {
+export const PostModal: FC<Props> = ({ isOpen, closeModal, userData }) => {
   const [files, setFiles] = useState<File[]>([]);
   const [title, setTitle] = useState("");
   const handleUpload = async (url: any) => {
@@ -21,6 +23,8 @@ export const PostModal: FC<Props> = ({ isOpen, closeModal }) => {
 
     const formData = new FormData();
     formData.append("title", title); // タイトルを追加
+    formData.append("user_id", userData.google_id); // ユーザーIDを追加
+    console.log("handle user_id", userData.google_id);
 
     // ファイルをリストとして追加
     files.forEach((file, index) => {

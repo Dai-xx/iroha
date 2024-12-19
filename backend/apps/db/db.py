@@ -98,7 +98,8 @@ def determine_language(file_type=None, filename=None):
 def upload_file():
     try:
         files = request.files
-        project_name = request.form.get('title', 'default_project') 
+        project_name = request.form.get('title', 'default_project')
+        user_id = request.form.get('user_id', None) 
         created_at = datetime.now()
 
         metadata_list = []
@@ -114,41 +115,42 @@ def upload_file():
 
         project_id = collection_metadata.insert_one({
             "projectname": project_name,
+            "user_id": user_id,
             "metadata_list": metadata_list,
             "created_at": created_at
         }).inserted_id
 
         file_list = []
         for file in files.values():
-            scan_result = scan_file_by_hash(file)
-            if 'error' in scan_result:
-                print(f"VirusTotal Scan Error: {scan_result['error']}")
-                return jsonify({'error': scan_result['error']}), 400
+            # scan_result = scan_file_by_hash(file)
+            # if 'error' in scan_result:
+            #     print(f"VirusTotal Scan Error: {scan_result['error']}")
+            #     return jsonify({'error': scan_result['error']}), 400
 
-            if "data" not in scan_result or "id" not in scan_result["data"]:
-                print(f"Invalid scan result: {scan_result}")
-                return jsonify({'error': 'Invalid scan result from VirusTotal.'}), 500
+            # if "data" not in scan_result or "id" not in scan_result["data"]:
+            #     print(f"Invalid scan result: {scan_result}")
+            #     return jsonify({'error': 'Invalid scan result from VirusTotal.'}), 500
             
-            analyses_id = scan_result["data"]["id"]
-            print(f"Analysis ID: {analyses_id}")
-            analysis_result = analyses_file(analyses_id)  # 🚀 ここでanalyses_fileを呼び出す
+            # analyses_id = scan_result["data"]["id"]
+            # print(f"Analysis ID: {analyses_id}")
+            # analysis_result = analyses_file(analyses_id)  # 🚀 ここでanalyses_fileを呼び出す
 
-            # 🔍 **デバッグ出力追加**
-            print(f"Analysis Result: {analysis_result}")  
+            # # 🔍 **デバッグ出力追加**
+            # print(f"Analysis Result: {analysis_result}")  
 
-            if 'error' in analysis_result:
-                print(f"Analysis Error: {analysis_result['error']}")
-                return jsonify({'error': analysis_result['error']}), 400
+            # if 'error' in analysis_result:
+            #     print(f"Analysis Error: {analysis_result['error']}")
+            #     return jsonify({'error': analysis_result['error']}), 400
             
-            stats = analysis_result.get("data", {}).get("attributes", {}).get("stats", {})
-            malicious_count = stats.get("malicious", 0)
+            # stats = analysis_result.get("data", {}).get("attributes", {}).get("stats", {})
+            # malicious_count = stats.get("malicious", 0)
             
-            if malicious_count > 0:
-                return jsonify({
-                    'error': '危険なファイルを検出',
-                    'filename': secure_filename(file.filename),
-                    'malicious_count': malicious_count
-                }), 422
+            # if malicious_count > 0:
+            #     return jsonify({
+            #         'error': '危険なファイルを検出',
+            #         'filename': secure_filename(file.filename),
+            #         'malicious_count': malicious_count
+            #     }), 422
             content = file.read()
             filename = secure_filename(file.filename)
             file_type = file.content_type
@@ -239,15 +241,16 @@ def analyses_file(analyses_id):
         return {'error': f'An error occurred: {str(e)}'}
 
 
-@db.route('/list/<int:current_page>', methods=['GET'])
-def list_files(current_page):
+@db.route('/list/<string:user_id>/<int:current_page>', methods=['GET'])
+def list_files(user_id, current_page):
     limit = 14
     skip = (current_page - 1) * limit
 
     # created_atが存在するドキュメントのみ取得
     metadata_cursor = collection_metadata.find(
-        {"created_at": {"$exists": True}},
-        {"projectname": 1, "metadata_list": 1, "created_at": 1}
+        {"created_at": {"$exists": True}, "user_id": user_id},
+        {"projectname": 1, "metadata_list": 1, "created_at": 1},
+     
     ).skip(skip).limit(limit).sort('created_at', -1)
 
     JSON_metadata_list = []

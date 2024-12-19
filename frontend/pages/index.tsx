@@ -14,6 +14,7 @@ import usePagination from "@/hooks/usePagination";
 import { validateName } from "@/utils/validateName";
 import Pagenaiton from "@/components/Pagenation";
 import { parseDate } from "@/utils/parseDate";
+import { userDataType } from "@/types/userDataType";
 
 interface Item {
   created_at: string;
@@ -30,8 +31,12 @@ export default function Home() {
   const { currentPage, totalPages, currentPosts, handlePageClick } =
     usePagination(mockmetaData, pageSize);
 
+  const [userData, setUserData] = useState<userDataType | null>(null);
+
+  const user_id = userData?.google_id;
+
   const { data: listData, error: listDataError } = useSWR(
-    `http://127.0.0.1:5000/db/list/${currentPage}`,
+    `http://127.0.0.1:5000/db/list/${user_id}/${currentPage}`,
     fetcher,
     {
       revalidateOnFocus: false,
@@ -76,7 +81,7 @@ export default function Home() {
   return (
     <>
       <div>
-        <Header />
+        <Header setUserData={setUserData} />
 
         <button
           onClick={openModal}
@@ -85,7 +90,13 @@ export default function Home() {
           <FaRegSquarePlus size={20} />
           New
         </button>
-        {isOpen && <PostModal isOpen={isOpen} closeModal={closeModal} />}
+        {isOpen && (
+          <PostModal
+            isOpen={isOpen}
+            closeModal={closeModal}
+            userData={userData}
+          />
+        )}
 
         <div className="mt-2">
           <div

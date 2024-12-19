@@ -1,10 +1,14 @@
 import Image from "next/image";
 import { BiLogIn } from "react-icons/bi";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import useSWR from "swr";
 import axios from "axios";
+
+type Prop = {
+  setUserData: any;
+};
 
 type User = {
   email: string;
@@ -22,7 +26,7 @@ const fetcher = (url: string) =>
       return null; // エラー時にはnullを返す
     });
 
-const Header = () => {
+const Header: FC<Prop> = ({ setUserData }) => {
   const { setTheme, theme } = useTheme();
   const [isChecked, setIsChecked] = useState(false);
 
@@ -51,8 +55,11 @@ const Header = () => {
     fetcher,
   );
 
+  useEffect(() => {
+    setUserData(user);
+  }, [user]);
+
   if (error) return <p>Error loading profile.</p>;
-  // if (!user) return <p>Loading...</p>;
 
   console.log("user", user);
 
