@@ -1,115 +1,221 @@
-import Image from "next/image";
-import localFont from "next/font/local";
+import { useState } from "react";
+import useSWR from "swr";
+import axios from "axios";
+import { FaRegSquarePlus } from "react-icons/fa6";
+import { RxCross2 } from "react-icons/rx";
+import { useSpring, animated } from "@react-spring/web";
+import { filedataMock } from "@/mocks/filedataMock";
+import Header from "@/components/Header";
+import { PostModal } from "@/components/PostModal";
+import { useOpenModal } from "@/hooks/useOpenModal";
+import CodeArea from "@/components/CodeArea";
+import { filecontentMock } from "@/mocks/filecontentMock";
+import usePagination from "@/hooks/usePagination";
+import { validateName } from "@/utils/validateName";
+import Pagenaiton from "@/components/Pagenation";
+import { parseDate } from "@/utils/parseDate";
+import { userDataType } from "@/types/userDataType";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+interface Item {
+  created_at: string;
+  project_id: string;
+  projectname: string;
+  metadata_list: { filename: string; file_type: string }[];
+}
+const fetcher = (url: any) => axios.get(url).then((res) => res.data);
 
 export default function Home() {
-  return (
-    <div
-      className={`${geistSans.variable} ${geistMono.variable} grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]`}
-    >
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              pages/index.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const mockmetaData = filedataMock;
+  const mockcontentData = filecontentMock;
+  const pageSize = 14;
+  const { currentPage, totalPages, currentPosts, handlePageClick } =
+    usePagination(mockmetaData, pageSize);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  const [userData, setUserData] = useState<userDataType | null>(null);
+
+  const user_id = userData?.google_id;
+
+  const { data: listData, error: listDataError } = useSWR(
+    `http://127.0.0.1:5000/db/list/${user_id}/${currentPage}`,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      keepPreviousData: true,
+    },
+  );
+
+  console.log("listData", listData);
+  const [projectId, setProjectId] = useState<string | null>(null);
+
+  const { data: previewData, error: previewDataError } = useSWR(
+    `http://127.0.0.1:5000/db/preview/${projectId}`,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      keepPreviousData: true,
+    },
+  );
+
+  const files = previewData && previewData.files;
+
+  const { isOpen, setIsOpen, openModal, closeModal } = useOpenModal();
+
+  const [isOpenCode, setIsOpenCode] = useState(false);
+
+  const handleProject = (item: Item) => {
+    console.log("item", item);
+    setProjectId(item.project_id);
+    setIsOpenCode(true);
+  };
+  console.log("project", projectId);
+
+  const style = useSpring({
+    width: isOpenCode ? "50%" : "100%",
+  });
+
+  const style2 = useSpring({
+    width: isOpenCode ? "50%" : "0",
+    opacity: isOpenCode ? 1 : 0,
+  });
+
+  return (
+    <>
+      <div>
+        <Header setUserData={setUserData} />
+
+        <button
+          onClick={openModal}
+          className="btn bg-accent text-accent-content"
+        >
+          <FaRegSquarePlus size={20} />
+          New
+        </button>
+        {isOpen && (
+          <PostModal
+            isOpen={isOpen}
+            closeModal={closeModal}
+            userData={userData}
+          />
+        )}
+
+        <div className="mt-2">
+          <div
+            className={`mx-auto flex h-[650px] w-full justify-center rounded-xl bg-base-300/50 p-10`}
           >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            <animated.div style={style}>
+              <ul className="grid h-full w-full grid-flow-col grid-cols-2 grid-rows-7 justify-items-center gap-3">
+                {listData &&
+                  listData.map((item: any, index: number) => {
+                    const dateObject = parseDate(item.created_at);
+                    const validatedProjectname = validateName(
+                      item.projectname,
+                      7,
+                    );
+                    const validatedFiles =
+                      isOpenCode && item.metadata_list.length > 1
+                        ? item.metadata_list.slice(0, 2)
+                        : item.metadata_list;
+
+                    return (
+                      <li
+                        key={index}
+                        onClick={() => handleProject(item)}
+                        className={`btn flex h-full w-full min-w-[250px] overflow-hidden rounded-btn bg-neutral p-2 hover:bg-base-300`}
+                      >
+                        <div className="flex h-full w-full items-center justify-start gap-3">
+                          {/* date */}
+                          <div>
+                            <div className="flex justify-between gap-2">
+                              <p>{dateObject.month}月</p>
+                              <p>{dateObject.dayOfWeek}</p>
+                            </div>
+                            <div className="text-4xl">{dateObject.date}</div>
+                          </div>
+                          {/* border */}
+                          <div className="h-full rounded-full border-l-2 border-white/30"></div>
+                          {/* projectname */}
+                          <div className="w-[70px] text-left text-base">
+                            <h3>{validatedProjectname}</h3>
+                          </div>
+
+                          {/* files */}
+                          <div className="grid-cols-auto-fill-[100px] grid flex-grow grid-rows-2 gap-1 font-normal">
+                            {item &&
+                              validatedFiles.map((file: any, index: number) => {
+                                const validatedFilename = validateName(
+                                  file.filename,
+                                  10,
+                                );
+
+                                return (
+                                  <div
+                                    key={index}
+                                    className="flex w-full items-center rounded-[6px] bg-base-300/50 p-1"
+                                  >
+                                    <p>{validatedFilename}</p>
+                                  </div>
+                                );
+                              })}
+                          </div>
+                        </div>
+                      </li>
+                    );
+                  })}
+              </ul>
+            </animated.div>
+
+            <animated.div style={style2} className="relative">
+              <button
+                onClick={() => setIsOpenCode(false)}
+                className="absolute right-0 rounded-full bg-gray-500 p-1"
+              >
+                <RxCross2 size={20} />
+              </button>
+              <div role="tablist" className="tabs tabs-lifted">
+                {files &&
+                  files.map((item: any, index: number) => {
+                    const isChecked = index === 0;
+                    console.log("content", item.content);
+                    const decodedContent = new TextDecoder("utf-8").decode(
+                      Uint8Array.from(atob(item.content), (c) =>
+                        c.charCodeAt(0),
+                      ),
+                    );
+                    return (
+                      <>
+                        <input
+                          key={index}
+                          type="radio"
+                          name="my_tabs"
+                          role="tab"
+                          className="tab"
+                          aria-label={item.filename}
+                          defaultChecked={isChecked}
+                        />
+                        <div
+                          role="tabpanel"
+                          className="tab-content rounded-box border-base-300 bg-base-100"
+                        >
+                          <div className="h-[530px] w-[590px] overflow-y-auto">
+                            <CodeArea code={decodedContent} />
+                          </div>
+                        </div>
+                      </>
+                    );
+                  })}
+              </div>
+            </animated.div>
+          </div>
+          <div className="mt-3">
+            <nav className="flex justify-center">
+              <Pagenaiton
+                totalPages={totalPages}
+                handlePageClick={handlePageClick}
+              />
+            </nav>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </div>
+    </>
   );
 }
