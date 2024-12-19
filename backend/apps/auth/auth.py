@@ -15,7 +15,7 @@ CORS(auth, origins="http://localhost:3000", supports_credentials=True)
 # Google OAuth 2.0の設定
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 GOOGLE_CLIENT_ID ="4289035441-sjlg41b0fti1m31e87ke7mak58ot135b.apps.googleusercontent.com"
-GOOGLE_CLIENT_SECRET = "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"
+GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
 REDIRECT_URI = "http://localhost:5000/auth/callback"
 
 

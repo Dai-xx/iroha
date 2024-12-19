@@ -10,9 +10,7 @@ from dotenv import load_dotenv
 import requests
 import hashlib
 import base64
-import ssl
 import os
-import io
 
 db = Blueprint("db", __name__, template_folder="templates", static_folder="satic")
 
@@ -21,7 +19,6 @@ CORS(db)
 # MongoDBの接続処理
 load_dotenv()
 uri = os.environ.get("MONGO_URI")
-#uri = "mongodb+srv://taneyukihiro:taym37921103@cluster0.vxk9i.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 VIRUSTOTAL_API_KEY =  os.environ.get("VIRUSTOTAL_API_KEY")
 VIRUSTOTAL_FILE_LOOKUP_URL = "https://www.virustotal.com/api/v3"
 client = MongoClient(uri, server_api=ServerApi(
