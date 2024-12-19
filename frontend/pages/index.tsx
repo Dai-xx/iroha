@@ -73,6 +73,10 @@ export default function Home() {
     opacity: isOpenCode ? 1 : 0,
   });
 
+  const fileblockStyle = useSpring({
+    flexGrow: isOpenCode ? 0.5 : 1, // アニメーション対象の flex-grow を指定
+  });
+
   return (
     <>
       <div>
@@ -92,53 +96,62 @@ export default function Home() {
             className={`mx-auto flex h-[650px] w-full justify-center rounded-xl bg-base-300/50 p-10`}
           >
             <animated.div style={style}>
-              <ul className="grid w-full grid-flow-col grid-cols-2 grid-rows-7 justify-items-center gap-3">
+              <ul className="grid h-full w-full grid-flow-col grid-cols-2 grid-rows-7 justify-items-center gap-3">
                 {listData &&
                   listData.map((item: any, index: number) => {
                     const dateObject = parseDate(item.created_at);
+                    const validatedProjectname = validateName(
+                      item.projectname,
+                      5,
+                    );
+                    const validatedFiles =
+                      isOpenCode && item.metadata_list.length > 1
+                        ? item.metadata_list.slice(0, 2)
+                        : item.metadata_list;
+
                     return (
                       <li
                         key={index}
                         onClick={() => handleProject(item)}
-                        className={`btn no-animation h-[70px] w-full min-w-[250px] overflow-hidden bg-neutral`}
+                        className={`btn flex h-full w-full min-w-[250px] overflow-hidden rounded-btn bg-neutral p-2 hover:bg-base-300`}
                       >
-                        <div className="w-full">
-                          <div className="flex h-full gap-5 rounded-lg p-1 text-white">
-                            <div className="flex">
-                              <div>
-                                <div className="flex justify-between gap-2">
-                                  <p>{dateObject.month}月</p>
-                                  <p>{dateObject.dayOfWeek}</p>
-                                </div>
-                                <div className="text-4xl">
-                                  {dateObject.date}
-                                </div>
-                              </div>
-                              <div className="mx-2 rounded-full border-l-2 border-white/50"></div>
-                              <div className="w-[50px] text-left text-lg">
-                                <h3>{item.projectname}</h3>
-                              </div>
+                        <div className="flex h-full w-full items-center justify-start gap-3">
+                          {/* date */}
+                          <div>
+                            <div className="flex justify-between gap-2">
+                              <p>{dateObject.month}月</p>
+                              <p>{dateObject.dayOfWeek}</p>
                             </div>
-                            <div className="grid w-[200px] grid-cols-2 grid-rows-2 gap-1 font-normal">
-                              {item &&
-                                item.metadata_list.map(
-                                  (file: any, index: number) => {
-                                    const validatedFilename = validateName(
-                                      file.filename,
-                                      10,
-                                    );
-                                    return (
-                                      <div
-                                        key={index}
-                                        className="flex items-center rounded-[6px] bg-base-300/50 px-3 py-1"
-                                      >
-                                        <p>{validatedFilename}</p>
-                                      </div>
-                                    );
-                                  },
-                                )}
-                            </div>
+                            <div className="text-4xl">{dateObject.date}</div>
                           </div>
+                          {/* border */}
+                          <div className="h-full rounded-full border-l-2 border-white/30"></div>
+                          {/* projectname */}
+                          <div className="flex w-[60px] items-start text-left text-lg">
+                            <h3>{validatedProjectname}</h3>
+                          </div>
+
+                          {/* files */}
+                          {/* <animated.div style={fileblockStyle}> */}
+                          <div className="grid-cols-auto-fill-[100px] grid flex-grow grid-rows-2 gap-1 font-normal">
+                            {item &&
+                              validatedFiles.map((file: any, index: number) => {
+                                const validatedFilename = validateName(
+                                  file.filename,
+                                  10,
+                                );
+
+                                return (
+                                  <div
+                                    key={index}
+                                    className="flex w-full items-center rounded-[6px] bg-base-300/50 p-1"
+                                  >
+                                    <p>{validatedFilename}</p>
+                                  </div>
+                                );
+                              })}
+                          </div>
+                          {/* </animated.div> */}
                         </div>
                       </li>
                     );

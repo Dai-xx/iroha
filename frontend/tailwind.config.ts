@@ -1,4 +1,5 @@
 import daisyui from "daisyui";
+import plugin from "tailwindcss/plugin";
 import type { Config } from "tailwindcss";
 
 const config: Config = {
@@ -18,7 +19,19 @@ const config: Config = {
       },
     },
   },
-  plugins: [daisyui],
+  plugins: [
+    plugin(({ matchUtilities, theme }) => {
+      matchUtilities(
+        {
+          "grid-cols-auto-fill": (value) => ({
+            gridTemplateColumns: `repeat(auto-fill, minmax(${value}, 1fr))`,
+          }),
+        },
+        { values: theme("spacing") },
+      );
+    }),
+    daisyui,
+  ],
   daisyui: {
     themes: false, // false: only light + dark | true: all themes | array: specific themes like this ["light", "dark", "cupcake"]
     darkTheme: "dark", // name of one of the included themes for dark mode
