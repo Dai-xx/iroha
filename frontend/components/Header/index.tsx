@@ -52,7 +52,7 @@ const Header = () => {
   );
 
   if (error) return <p>Error loading profile.</p>;
-  if (!user) return <p>Loading...</p>;
+  // if (!user) return <p>Loading...</p>;
 
   console.log("user", user);
 
